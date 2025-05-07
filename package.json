@@ -15,9 +15,10 @@
     "typecheck": "tsc",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepublishOnly": "npm run build",
-    "test": "vitest run",
-    "commit": "git-cz"
+    "pub": "npm publish --access public",
+    "version:patch": "standard-version --release-as patch",
+    "version:minor": "standard-version --release-as minor",
+    "version:major": "standard-version --release-as major"
   },
   "exports": {
     ".": {

@@ -1,4 +1,4 @@
-name: Publish to NPM
+name: Publish UI Kit to NPM
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       version_type:
         description: 'Version bump type'
         required: true
-        default: 'patch'
+        default: 'minor'
         type: choice
         options:
           - patch
@@ -19,40 +19,38 @@ jobs:
     permissions:
       contents: write
       packages: write
+    
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git config --global pull.rebase false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+          ls -R dist # Проверка собранных файлов
 
       - name: Get package info
         id: package
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Get published version
-        id: npm_version
-        run: |
-          PUBLISHED_VERSION=$(npm view ${{ steps.package.outputs.PACKAGE_NAME }} version 2>/dev/null || echo "0.0.0")
-          echo "PUBLISHED_VERSION=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
 
       - name: Bump version
         id: bump
         run: |
-          IFS='.' read -r major minor patch <<< "${{ steps.npm_version.outputs.PUBLISHED_VERSION }}"
+          CURRENT_VERSION=$(npm view ${{ steps.package.outputs.PACKAGE_NAME }} version 2>/dev/null || echo "0.0.0")
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
           case "${{ inputs.version_type }}" in
             major) major=$((major + 1)); minor=0; patch=0;;
             minor) minor=$((minor + 1)); patch=0;;
@@ -60,33 +58,25 @@ jobs:
           esac
           NEW_VERSION="${major}.${minor}.${patch}"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Create and push tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git tag -a "v${{ steps.bump.outputs.NEW_VERSION }}" -m "Release v${{ steps.bump.outputs.NEW_VERSION }}"
-          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/${{ github.repository }}.git
-          git push origin "v${{ steps.bump.outputs.NEW_VERSION }}"
+          npm version $NEW_VERSION --no-git-tag-version
 
       - name: Publish to NPM
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npm pkg set version="${{ steps.bump.outputs.NEW_VERSION }}"
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           npm publish --access public
+          echo "Published ${{ steps.package.outputs.PACKAGE_NAME }}@${{ steps.bump.outputs.NEW_VERSION }}"
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ steps.bump.outputs.NEW_VERSION }}"
-          release_name: "v${{ steps.bump.outputs.NEW_VERSION }}"
+          tag_name: v${{ steps.bump.outputs.NEW_VERSION }}
+          release_name: v${{ steps.bump.outputs.NEW_VERSION }}
           body: |
-            ## Version ${{ steps.bump.outputs.NEW_VERSION }}
-            - Type: ${{ inputs.version_type }}
-            - Previous: ${{ steps.npm_version.outputs.PUBLISHED_VERSION }}
+            ## Changes in v${{ steps.bump.outputs.NEW_VERSION }}
+            - Version bump: ${{ inputs.version_type }}
           draft: false
           prerelease: false

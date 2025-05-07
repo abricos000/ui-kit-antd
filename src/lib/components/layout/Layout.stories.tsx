@@ -8,7 +8,7 @@ const meta: Meta<typeof Layout.Header> = {
   parameters: {
     docs: {
       description: {
-        component: "Это пиздец, но работает",
+        component: "Это пиздец, но работает Layout",
       },
     },
   },

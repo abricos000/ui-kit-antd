@@ -1,8 +1,11 @@
-name: Deploy Storybook to GitHub Pages
+name: Build UI Kit and Deploy Storybook
 
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [closed]
+  workflow_dispatch:  # Ручной запуск
 
 permissions:
   contents: write
@@ -10,10 +13,44 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build UI Kit
     runs-on: ubuntu-latest
+    # Запускаем только при push/merge или ручном запуске
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
+    
     steps:
-      - name: Checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: npm run build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist/
+
+  deploy-storybook:
+    name: Deploy Storybook
+    needs: build  # Зависит от сборки (но пропускает если build не запускался)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'  # ТОЛЬКО ручной запуск
+    
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js

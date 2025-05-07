@@ -60,28 +60,37 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
 
+      - name: Prepare for publish
+        run: |
+          # Создаем временную директорию
+          mkdir -p .temp_publish
+          
+          # Копируем ВСЕ файлы (кроме node_modules и .git)
+          find . -maxdepth 1 -not -name '.' -not -name '..' -not -name 'node_modules' -not -name '.git' -exec cp -r {} .temp_publish/ \;
+          
+          # Переходим в временную директорию
+          cd .temp_publish
+          
+          # Обновляем версию
+          node <<EOF
+          const fs = require('fs');
+          const pkg = require('./package.json');
+          pkg.version = '${{ steps.bump.outputs.NEW_VERSION }}';
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          EOF
+
       - name: Publish package
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Создаем временный package.json с новой версией
-          mkdir -p temp_publish
-          cp -r dist temp_publish/
-          cp package.json temp_publish/
-          cd temp_publish
-          
-          # Обновляем версию через node.js (без npm)
-          node <<EOF
-          const fs = require('fs');
-          const pkg = require('../package.json');
-          pkg.version = '${{ steps.bump.outputs.NEW_VERSION }}';
-          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          EOF
-          
-          # Публикуем из временной директории
+          cd .temp_publish
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           npm publish --access public
           echo "Published ${{ steps.package.outputs.PACKAGE_NAME }}@${{ steps.bump.outputs.NEW_VERSION }}"
+
+      - name: Cleanup
+        run: |
+          rm -rf .temp_publish
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

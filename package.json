@@ -1,7 +1,7 @@
 {
   "name": "ui-kit-custom-antd-v1",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "files": [
     "dist"
@@ -60,6 +60,5 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vite-plugin-dts": "^3.6.3"
-  
-}
+  }
 }

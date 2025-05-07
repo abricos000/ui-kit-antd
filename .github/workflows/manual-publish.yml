@@ -40,21 +40,29 @@ jobs:
           npm install -g standard-version@latest
           npm ci
 
-      - name: Bump version
+      - name: Bump version in repository
         id: versioning
         run: |
+          # Проверяем, существует ли версия уже в NPM
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           if npm view ui-kit-custom-antd@$CURRENT_VERSION version >/dev/null 2>&1; then
             echo "::error::Version $CURRENT_VERSION already exists in npm"
             exit 1
           fi
           
-          standard-version --release-as ${{ inputs.version_type }} --skip.commit --skip.tag
+          # Обновляем версию в package.json и создаем CHANGELOG.md
+          npx standard-version --release-as ${{ inputs.version_type }} --skip.tag
+          
+          # Получаем новую версию
           NEW_VERSION=$(node -p "require('./package.json').version")
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
-          echo "Created version $NEW_VERSION"
+          echo "Version bumped to $NEW_VERSION"
 
-      - name: Create git tag
+          # Коммитим изменения версии
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+
+      - name: Create and push git tag
         run: |
           git tag -a v${{ env.NEW_VERSION }} -m "Release v${{ env.NEW_VERSION }}"
           echo "Created tag v${{ env.NEW_VERSION }}"
@@ -67,7 +75,7 @@ jobs:
           npm publish --access public
           echo "Published ui-kit-custom-antd@${{ env.NEW_VERSION }} to NPM"
 
-      - name: Push changes
+      - name: Push changes to repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -75,7 +83,7 @@ jobs:
           git pull origin main
           git push origin main
           git push origin v${{ env.NEW_VERSION }}
-          echo "Pushed changes and tag v${{ env.NEW_VERSION }} to GitHub"
+          echo "Pushed version changes and tag v${{ env.NEW_VERSION }} to GitHub"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

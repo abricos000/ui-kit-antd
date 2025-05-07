@@ -10,12 +10,14 @@
   "module": "./dist/antd-ui-kit.es.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepublishOnly": "npm run build",
+    "test": "vitest run",
+    "commit": "git-cz"
   },
   "exports": {
     ".": {
@@ -32,6 +34,9 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.4",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^12.0.1",
     "@storybook/addon-essentials": "^8.5.3",
     "@storybook/addon-interactions": "^8.5.3",
     "@storybook/addon-onboarding": "^8.5.3",
@@ -43,13 +48,26 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint-plugin-storybook": "^0.11.2",
     "hoist-non-react-statics": "^3.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "semantic-release": "^24.2.3",
     "storybook": "^8.5.3",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vite-plugin-dts": "^3.6.3"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  },
+  "config": {
+  "commitizen": {
+    "path": "./node_modules/cz-conventional-changelog"
   }
+}
 }

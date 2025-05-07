@@ -7,7 +7,7 @@ const meta: Meta<typeof Button> = {
   parameters: {
     docs: {
       description: {
-        component: "Это пиздец, но работает АААААААААААААААААААААА",
+        component: "Это компонент кнопки, ниже представленны все ёё вариации",
       },
     },
   },

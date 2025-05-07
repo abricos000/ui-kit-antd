@@ -1,4 +1,4 @@
-name: Publish UI Kit to NPM
+name: Publish to NPM
 
 on:
   workflow_dispatch:
@@ -24,7 +24,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Настройка Git должна быть ПЕРВОЙ операцией
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"

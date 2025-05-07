@@ -23,11 +23,8 @@ jobs:
         id: package
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "PACKAGE_NAME=$PACKAGE_NAME" >> $GITHUB_OUTPUT
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Package name: $PACKAGE_NAME"
-          echo "Current version: $CURRENT_VERSION"
 
       - uses: actions/setup-node@v4
         with:
@@ -41,16 +38,25 @@ jobs:
           echo "PUBLISHED_VERSION=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
           echo "Published version: $PUBLISHED_VERSION"
 
-      - name: Bump version
+      - name: Calculate new version
         id: bump
         run: |
-          IFS='.' read -r major minor patch <<< "${PUBLISHED_VERSION//v}"
+          IFS='.' read -r major minor patch <<< "${{ steps.npm_version.outputs.PUBLISHED_VERSION }}"
           case "${{ inputs.version_type }}" in
-            major) major=$((major + 1)); minor=0; patch=0;;
-            minor) minor=$((minor + 1)); patch=0;;
-            patch) patch=$((patch + 1));;
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
           esac
-          NEW_VERSION="$major.$minor.$patch"
+          NEW_VERSION="${major}.${minor}.${patch}"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION"
 
@@ -58,16 +64,24 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Временное обновление версии
-          npm pkg set version=${{ steps.bump.outputs.NEW_VERSION }}
+          # Создаем временный package.json с новой версией
+          mkdir -p temp_publish
+          cp -r dist temp_publish/
+          cp package.json temp_publish/
+          cd temp_publish
           
-          # Публикация
+          # Обновляем версию через node.js (без npm)
+          node <<EOF
+          const fs = require('fs');
+          const pkg = require('../package.json');
+          pkg.version = '${{ steps.bump.outputs.NEW_VERSION }}';
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          EOF
+          
+          # Публикуем из временной директории
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           npm publish --access public
           echo "Published ${{ steps.package.outputs.PACKAGE_NAME }}@${{ steps.bump.outputs.NEW_VERSION }}"
-          
-          # Возвращаем исходную версию
-          npm pkg set version=${{ steps.package.outputs.CURRENT_VERSION }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

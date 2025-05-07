@@ -25,22 +25,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            .npm
-            dist
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -66,22 +54,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            .npm
-            storybook-static
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci

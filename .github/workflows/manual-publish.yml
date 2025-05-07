@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version_type:
-        description: 'Version bump type'
+        description: 'Version bump type (patch/minor/major)'
         required: true
         default: 'minor'
         type: choice
@@ -22,11 +22,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
+          git config --global pull.rebase false
 
       - uses: actions/setup-node@v4
         with:
@@ -38,13 +40,24 @@ jobs:
           npm install -g standard-version@latest
           npm ci
 
-      - name: Bump version and create tag
+      - name: Bump version
         id: versioning
         run: |
-          NEW_VERSION=$(standard-version --release-as ${{ inputs.version_type }} --dry-run | grep 'tagging release' | awk '{print $4}')
-          standard-version --release-as ${{ inputs.version_type }} --skip.changelog --skip.commit
-          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
-          echo "Created tag v${NEW_VERSION}"
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if npm view ui-kit-custom-antd@$CURRENT_VERSION version >/dev/null 2>&1; then
+            echo "::error::Version $CURRENT_VERSION already exists in npm"
+            exit 1
+          fi
+          
+          standard-version --release-as ${{ inputs.version_type }} --skip.commit --skip.tag
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "Created version $NEW_VERSION"
+
+      - name: Create git tag
+        run: |
+          git tag -a v${{ env.NEW_VERSION }} -m "Release v${{ env.NEW_VERSION }}"
+          echo "Created tag v${{ env.NEW_VERSION }}"
 
       - name: Publish to NPM
         env:
@@ -52,19 +65,26 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           npm publish --access public
+          echo "Published ui-kit-custom-antd@${{ env.NEW_VERSION }} to NPM"
 
-      - name: Push changes and tags
+      - name: Push changes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/${{ github.repository }}.git
+          git pull origin main
           git push origin main
-          git push origin v${{ steps.versioning.outputs.NEW_VERSION }}
+          git push origin v${{ env.NEW_VERSION }}
+          echo "Pushed changes and tag v${{ env.NEW_VERSION }} to GitHub"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.versioning.outputs.NEW_VERSION }}
+          tag_name: v${{ env.NEW_VERSION }}
+          name: v${{ env.NEW_VERSION }}
+          body: |
+            Changes in this version:
+            - See CHANGELOG.md for details
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

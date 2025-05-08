@@ -3,19 +3,19 @@ name: UI Kit CI/CD
 on:
   workflow_dispatch:
     inputs:
-      run_job:
-        description: 'Select job to run' 
+      job_to_run:
+        description: 'Select job to execute'
         type: choice
         required: true
         options:
           - build
-          - deploy
-          - publish
+          - deploy-storybook
+          - publish-npm
 
 jobs:
   build:
     name: 🛠️ Build UI Kit
-    if: ${{ github.event.inputs.run_job == 'build' }}
+    if: ${{ github.event.inputs.job_to_run == 'build' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,13 +26,16 @@ jobs:
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: ui-kit-build
           path: dist/
 
-  deploy:
+  deploy-storybook:
     name: 📚 Deploy Storybook
-    if: ${{ github.event.inputs.run_job == 'deploy' }}
+    if: ${{ github.event.inputs.job_to_run == 'deploy-storybook' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,14 +43,24 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build-storybook
-      - uses: peaceiris/actions-gh-pages@v4
+      
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: storybook-static
+          force_orphan: true
+          keep_files: false
+          enable_jekyll: false
+          user_name: 'github-actions'
+          user_email: 'github-actions@users.noreply.github.com'
 
-  publish:
+      - name: 🔗 Show deployment URL
+        run: echo "Deployed to: https://${{ github.repository_owner }}.github.io/${{ github.repository_name }}/"
+
+  publish-npm:
     name: 📦 Publish to NPM
-    if: ${{ github.event.inputs.run_job == 'publish' }}
+    if: ${{ github.event.inputs.job_to_run == 'publish-npm' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

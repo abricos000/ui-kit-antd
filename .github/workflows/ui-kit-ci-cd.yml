@@ -1,68 +1,92 @@
-name: UI Kit CI/CD Stepper
+name: UI Kit CI/CD
 
 on:
   workflow_dispatch:
     inputs:
-      step:
-        description: 'Select workflow step'
+      job_to_run:
+        description: 'Select job to execute'
         type: choice
         required: true
         options:
-          - 1. Build Only
-          - 2. Build + Deploy Storybook
-          - 3. Build + Publish to NPM
-          - 4. Full Pipeline (All Steps)
-        default: '1. Build Only'
+          - build
+          - deploy-storybook
+          - publish-npm
 
 jobs:
   build:
-    name: "🚀 Step 1: Build"
+    name: 🛠️ Build UI Kit
+    if: ${{ github.event.inputs.job_to_run == 'build' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-artifact@v4
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+          
+      - name: 🏗️ Build
+        run: npm run build
+        
+      - name: 📤 Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
+          name: ui-kit-build
           path: dist/
 
-  deploy:
-    name: "📚 Step 2: Deploy Storybook"
-    needs: build
-    if: ${{ contains(github.event.inputs.step, 'Deploy') || contains(github.event.inputs.step, 'Full') }}
+  deploy-storybook:
+    name: 📚 Deploy Storybook
+    if: ${{ github.event.inputs.job_to_run == 'deploy-storybook' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build-storybook
-      - uses: peaceiris/actions-gh-pages@v4
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🏗️ Build Storybook
+        run: npm run build-storybook
+        
+      - name: 🚀 Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: storybook-static
+          force_orphan: true
+          keep_files: false
+          enable_jekyll: false
 
-  publish:
-    name: "📦 Step 3: Publish to NPM"
-    needs: build
-    if: ${{ contains(github.event.inputs.step, 'Publish') || contains(github.event.inputs.step, 'Full') }}
+  publish-npm:
+    name: 📦 Publish to NPM
+    if: ${{ github.event.inputs.job_to_run == 'publish-npm' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      
+      - name: ⎔ Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm publish --access public
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+          
+      - name: 🏗️ Build
+        run: npm run build
+        
+      - name: 🚀 Publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

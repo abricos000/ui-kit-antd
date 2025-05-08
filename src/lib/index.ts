@@ -12,6 +12,7 @@ export { default as Table } from './components/table/Table';
 export { default as Typography } from './components/typography/Typography';
 export { default as Avatar } from './components/avatar/Avatar';
 export { default as Calendar } from './components/calendar/Calendar';
+export { default as Checkbox } from './components/checkbox/Checkbox';
 
 
 ////////////////// type
@@ -37,7 +38,11 @@ export type {
 export type { TypographyProps } from 'antd';
 export type { AvatarProps } from 'antd';
 export type { CalendarProps } from 'antd';
-
+export type {
+  CheckboxOptionType,
+  CheckboxProps,
+  CheckboxRef,
+} from 'antd';
 
 
 
@@ -64,12 +69,6 @@ export { Carousel } from 'antd';
 export type { CarouselProps } from 'antd';
 export { Cascader } from 'antd';
 export type { CascaderProps } from 'antd';
-export { Checkbox } from 'antd';
-export type {
-  CheckboxOptionType,
-  CheckboxProps,
-  CheckboxRef,
-} from 'antd';
 export { Col } from 'antd';
 export type { ColProps } from 'antd';
 export { Collapse } from 'antd';

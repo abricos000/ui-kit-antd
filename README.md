@@ -13,6 +13,7 @@ npm install ui-kit-custom-antd-v2
 
 ```js
 // Реализация в вашей библиотеке:
+import React from "react";
 import { Button } from 'antd';
 export default withTheme(Button); // Автоматическая обертка в ConfigProvider
 ```
@@ -50,6 +51,7 @@ export const defaultTheme: ThemeConfig = {
 Вариант 1: Стилизация через styled()
 ```tsx
 // Пример для кастомного Button
+import React from "react";
 import { Button as AntdButton } from 'antd';
 import styled from 'styled-components';
 
@@ -88,7 +90,7 @@ export const Button = styled(AntdButton)`
 
 Данные: `Table`, `Tag`, `Tooltip`, `Modal`
 
-и другие ([см. документацию Ant Design]('https://ant.design/components/overview'))
+и другие ([см. документацию Ant Design](https://ant.design/components/overview))
 
 ## ⚠️ Важные ограничения
 
@@ -104,7 +106,7 @@ import React from "react";
 
 ## ▶️ Пример использования
 ```jsx
-import { Button, Input } from '@your-company/ui-foundation';
+import { Button, Input } from 'ui-kit-custom-antd-v2';
 
 function App() {
   return (

@@ -27,33 +27,33 @@ jobs:
           name: ui-kit-build
           path: dist/
 
-deploy-storybook:
-  name: Deploy Storybook to GitHub Pages
-  needs: build-ui-kit
-  runs-on: ubuntu-latest
-  permissions:
-    contents: write # Явно даем права на запись
-  steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        
-    - name: Install dependencies
-      run: npm ci
+  deploy-storybook:
+    name: Deploy Storybook to GitHub Pages
+    needs: build-ui-kit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Явно даем права на запись
+    steps:
+      - uses: actions/checkout@v4
       
-    - name: Build Storybook
-      run: npm run build-storybook
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          
+      - name: Install dependencies
+        run: npm ci
       
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: storybook-static
-        force_orphan: true
-        keep_files: false
+      - name: Build Storybook
+        run: npm run build-storybook
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: storybook-static
+          force_orphan: true
+          keep_files: false
           
   publish-npm:
     name: Publish to NPM

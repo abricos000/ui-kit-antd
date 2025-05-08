@@ -35,8 +35,6 @@ jobs:
     permissions:
       contents: write
       pages: write
-      id-token: write
-      
     steps:
       - uses: actions/checkout@v4
       
@@ -50,19 +48,25 @@ jobs:
         run: npm ci
       
       - name: Build Storybook
-        run: npm run build-storybook
+        run: |
+          npm run build-storybook
+          touch storybook-static/.nojekyll
+          echo "Your custom domain" > storybook-static/CNAME  # Если используете кастомный домен
         
-      - name: Verify Storybook build
-        run: ls -R storybook-static
-      
-      # Альтернативный метод деплоя без configure-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: storybook-static
           force_orphan: true
+          keep_files: false
           enable_jekyll: false
+
+      - name: Verify deployment
+        run: |
+          echo "Storybook deployed to:"
+          echo "https://${{ github.repository_owner }}.github.io/${{ github.repository_name }}/"
+          echo "If 404, wait 1-2 minutes and refresh"
 
   publish-npm:
     name: Publish to NPM

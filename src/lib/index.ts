@@ -10,6 +10,7 @@ export { default as Pagination } from './components/pagination/Pagination';
 export { default as Switch } from './components/switch/Switch';
 export { default as Table } from './components/table/Table';
 export { default as Typography } from './components/typography/Typography';
+export { default as Avatar } from './components/avatar/Avatar';
 
 ////////////////// type
 export type { ButtonProps } from 'antd';
@@ -32,6 +33,7 @@ export type {
   TableProps,
 } from 'antd';
 export type { TypographyProps } from 'antd';
+export type { AvatarProps } from 'antd';
 
 ///////////////////////////////// import antd
 
@@ -46,8 +48,6 @@ export { App } from 'antd';
 export type { AppProps } from 'antd';
 export { AutoComplete } from 'antd';
 export type { AutoCompleteProps } from 'antd';
-export { Avatar } from 'antd';
-export type { AvatarProps } from 'antd';
 export { BackTop } from 'antd';
 export type { BackTopProps } from 'antd';
 export { Calendar } from 'antd';

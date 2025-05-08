@@ -8,7 +8,7 @@ const meta: Meta<typeof Checkbox> = {
   parameters: {
     docs: {
       description: {
-        component: "Checkbox jjjjjj",
+        component: "Checkbox",
       },
     },
   },

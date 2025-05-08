@@ -2,93 +2,107 @@ name: UI Kit CI/CD
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ] # Автозапуск при пуше в main (опционально)
 
 jobs:
   build-ui-kit:
-    name: Build UI Kit
+    name: 🛠️ Build UI Kit
     runs-on: ubuntu-latest
+    outputs:
+      build-version: ${{ steps.get-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: ⎔ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
           
-      - name: Build UI Kit
+      - name: 🏗️ Build UI Kit
         run: npm run build
         
-      - name: Upload artifacts
+      - name: 🔍 Get package version
+        id: get-version
+        run: echo "version=$(node -p 'require("./package.json").version')" >> $GITHUB_OUTPUT
+        
+      - name: 📤 Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ui-kit-build
+          name: ui-kit-${{ steps.get-version.outputs.version }}
           path: dist/
 
   deploy-storybook:
-    name: Deploy Storybook
+    name: 📚 Deploy Storybook
     needs: build-ui-kit
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pages: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: ⎔ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
       
-      - name: Build Storybook
+      - name: 🏗️ Build Storybook
         run: |
           npm run build-storybook
-          touch storybook-static/.nojekyll
-          echo "Your custom domain" > storybook-static/CNAME  # Если используете кастомный домен
-        
-      - name: Deploy to GitHub Pages
+          echo "✔ Storybook built successfully"
+          ls -R storybook-static
+          
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: storybook-static
           force_orphan: true
-          keep_files: false
           enable_jekyll: false
+          user_name: 'GitHub Actions'
+          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
 
-      - name: Verify deployment
+      - name: 🔗 Show deployment URL
         run: |
-          echo "Storybook deployed to:"
-          echo "https://${{ github.repository_owner }}.github.io/${{ github.repository_name }}/"
+          echo "Storybook deployed to: ${{ steps.deployment.outputs.page_url }}"
           echo "If 404, wait 1-2 minutes and refresh"
 
   publish-npm:
-    name: Publish to NPM
+    name: 📦 Publish to NPM
     needs: build-ui-kit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: ⎔ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
           
-      - name: Rebuild UI Kit
+      - name: 🔄 Rebuild UI Kit
         run: npm run build
         
-      - name: Publish to NPM
-        run: npm publish --access public
+      - name: 🚀 Publish to NPM
+        run: |
+          npm publish --access public
+          echo "Package published: $(node -p 'require("./package.json").name')@$(node -p 'require("./package.json").version')"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

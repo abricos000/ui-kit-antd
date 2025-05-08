@@ -14,6 +14,10 @@ export { default as Avatar } from './components/avatar/Avatar';
 export { default as Calendar } from './components/calendar/Calendar';
 export { default as Checkbox } from './components/checkbox/Checkbox';
 
+export { default as Card } from './components/card/Card';
+export { default as Tag } from './components/tag/Tag';
+export { default as Form } from './components/form/Form';
+export { default as Input } from './components/input/Input';
 
 ////////////////// type
 export type { ButtonProps } from 'antd';
@@ -43,9 +47,17 @@ export type {
   CheckboxProps,
   CheckboxRef,
 } from 'antd';
-
-
-
+export type { CardProps } from 'antd';
+export type { TagProps, TagType } from 'antd';
+export type {
+  FormInstance,
+  FormItemProps,
+  FormListFieldData,
+  FormListOperation,
+  FormProps,
+  FormRule,
+} from 'antd';
+export type { InputProps, InputRef } from 'antd';
 
 
 ///////////////////////////////// import antd
@@ -63,8 +75,6 @@ export { AutoComplete } from 'antd';
 export type { AutoCompleteProps } from 'antd';
 export { BackTop } from 'antd';
 export type { BackTopProps } from 'antd';
-export { Card } from 'antd';
-export type { CardProps } from 'antd';
 export { Carousel } from 'antd';
 export type { CarouselProps } from 'antd';
 export { Cascader } from 'antd';
@@ -95,20 +105,9 @@ export type {
   FloatButtonProps,
   FloatButtonRef,
 } from 'antd';
-export { Form } from 'antd';
-export type {
-  FormInstance,
-  FormItemProps,
-  FormListFieldData,
-  FormListOperation,
-  FormProps,
-  FormRule,
-} from 'antd';
 export { Grid } from 'antd';
 export { Image } from 'antd';
 export type { ImageProps } from 'antd';
-export { Input } from 'antd';
-export type { InputProps, InputRef } from 'antd';
 export { InputNumber } from 'antd';
 export type { InputNumberProps } from 'antd';
 export { List } from 'antd';
@@ -153,8 +152,6 @@ export { Steps } from 'antd';
 export type { StepProps, StepsProps } from 'antd';
 export { Tabs } from 'antd';
 export type { TabPaneProps, TabsProps } from 'antd';
-export { Tag } from 'antd';
-export type { TagProps, TagType } from 'antd';
 export { theme } from 'antd';
 export type { GlobalToken, MappingAlgorithm } from 'antd';
 export { TimePicker } from 'antd';

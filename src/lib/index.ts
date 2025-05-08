@@ -11,6 +11,8 @@ export { default as Switch } from './components/switch/Switch';
 export { default as Table } from './components/table/Table';
 export { default as Typography } from './components/typography/Typography';
 export { default as Avatar } from './components/avatar/Avatar';
+export { default as Calendar } from './components/calendar/Calendar';
+
 
 ////////////////// type
 export type { ButtonProps } from 'antd';
@@ -34,6 +36,12 @@ export type {
 } from 'antd';
 export type { TypographyProps } from 'antd';
 export type { AvatarProps } from 'antd';
+export type { CalendarProps } from 'antd';
+
+
+
+
+
 
 ///////////////////////////////// import antd
 
@@ -50,8 +58,6 @@ export { AutoComplete } from 'antd';
 export type { AutoCompleteProps } from 'antd';
 export { BackTop } from 'antd';
 export type { BackTopProps } from 'antd';
-export { Calendar } from 'antd';
-export type { CalendarProps } from 'antd';
 export { Card } from 'antd';
 export type { CardProps } from 'antd';
 export { Carousel } from 'antd';

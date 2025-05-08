@@ -1,7 +1,7 @@
 name: UI Kit CI/CD
 
 on:
-  workflow_dispatch: # Позволяет запускать workflow вручную
+  workflow_dispatch:
 
 jobs:
   build-ui-kit:
@@ -21,9 +21,6 @@ jobs:
           
       - name: Build UI Kit
         run: npm run build
-        
-      - name: Verify build output
-        run: ls -al dist/
         
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -56,23 +53,16 @@ jobs:
         run: npm run build-storybook
         
       - name: Verify Storybook build
-        run: |
-          ls -al storybook-static/
-          grep -r "YourNewStoryName" storybook-static/ || echo "New stories not found"
+        run: ls -R storybook-static
       
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      
-      - name: Upload Storybook
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: storybook-static
-      
+      # Альтернативный метод деплоя без configure-pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
-        id: deployment
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: storybook-static
+          force_orphan: true
+          enable_jekyll: false
 
   publish-npm:
     name: Publish to NPM

@@ -1,4 +1,4 @@
-name: Build UI Kit and Deploy Storybook
+name: Build and Deploy UI Kit & Storybook
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-    name: Build UI Kit
+    name: Build
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'push' ||
@@ -33,8 +33,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run build
+      - name: Build UI Kit
         run: npm run build
+
+      - name: Build Storybook
+        run: npm run build-storybook
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -42,32 +45,29 @@ jobs:
           name: build-artifacts
           path: |
             dist/
+            storybook-static/
             package.json
 
-  deploy-storybook:
-    name: Deploy Storybook
+  deploy:
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: '20'
+          name: build-artifacts
+          path: .
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Storybook
-        run: npm run build-storybook
-
-      - name: Deploy to GitHub Pages
+      - name: Deploy Storybook to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GH_PAT }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Используй GITHUB_TOKEN вместо GH_PAT
           publish_dir: ./storybook-static
-          keep_files: true
+          keep_files: false  # Убери keep_files или установи false для чистого деплоя
+          destination_dir: 'storybook'  # Опционально: деплой в подпапку

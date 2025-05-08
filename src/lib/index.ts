@@ -18,6 +18,9 @@ export { default as Card } from './components/card/Card';
 export { default as Tag } from './components/tag/Tag';
 export { default as Form } from './components/form/Form';
 export { default as Input } from './components/input/Input';
+export { default as Steps } from './components/steps/Steps';
+export { default as Select } from './components/select/Select';
+
 
 ////////////////// type
 export type { ButtonProps } from 'antd';
@@ -58,7 +61,8 @@ export type {
   FormRule,
 } from 'antd';
 export type { InputProps, InputRef } from 'antd';
-
+export type { StepProps, StepsProps } from 'antd';
+export type { RefSelectProps, SelectProps } from 'antd';
 
 ///////////////////////////////// import antd
 
@@ -136,8 +140,6 @@ export { Row } from 'antd';
 export type { RowProps } from 'antd';
 export { Segmented } from 'antd';
 export type { SegmentedProps } from 'antd';
-export { Select } from 'antd';
-export type { RefSelectProps, SelectProps } from 'antd';
 export { Skeleton } from 'antd';
 export type { SkeletonProps } from 'antd';
 export { Slider } from 'antd';
@@ -148,8 +150,6 @@ export { Spin } from 'antd';
 export type { SpinProps } from 'antd';
 export { Statistic } from 'antd';
 export type { CountdownProps, StatisticProps } from 'antd';
-export { Steps } from 'antd';
-export type { StepProps, StepsProps } from 'antd';
 export { Tabs } from 'antd';
 export type { TabPaneProps, TabsProps } from 'antd';
 export { theme } from 'antd';

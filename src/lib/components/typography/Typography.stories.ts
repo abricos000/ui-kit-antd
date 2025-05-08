@@ -8,7 +8,7 @@ const meta: Meta<typeof Typography.Title> = {
   parameters: {
     docs: {
       description: {
-        component: "Это пиздец, но работает",
+        component: "Typography",
       },
     },
   },

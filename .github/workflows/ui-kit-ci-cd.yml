@@ -2,15 +2,25 @@ name: UI Kit CI/CD
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ] # Автозапуск при пуше в main (опционально)
+    inputs:
+      job_to_run:
+        description: 'Select job to execute' 
+        type: choice
+        required: true
+        options:
+          - build
+          - deploy-storybook
+          - publish-npm
+          - all
+        default: 'all'
 
 jobs:
-  build-ui-kit:
+  build:
     name: 🛠️ Build UI Kit
+    if: ${{ github.event.inputs.job_to_run == 'build' || github.event.inputs.job_to_run == 'all' }}
     runs-on: ubuntu-latest
     outputs:
-      build-version: ${{ steps.get-version.outputs.version }}
+      version: ${{ steps.get-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
@@ -38,14 +48,12 @@ jobs:
 
   deploy-storybook:
     name: 📚 Deploy Storybook
-    needs: build-ui-kit
+    needs: build
+    if: ${{ github.event.inputs.job_to_run == 'deploy-storybook' || github.event.inputs.job_to_run == 'all' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pages: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       
@@ -61,28 +69,24 @@ jobs:
       - name: 🏗️ Build Storybook
         run: |
           npm run build-storybook
-          echo "✔ Storybook built successfully"
+          echo "Storybook files:"
           ls -R storybook-static
           
       - name: 🚀 Deploy to GitHub Pages
-        id: deployment
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: storybook-static
           force_orphan: true
           enable_jekyll: false
-          user_name: 'GitHub Actions'
-          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
 
-      - name: 🔗 Show deployment URL
-        run: |
-          echo "Storybook deployed to: ${{ steps.deployment.outputs.page_url }}"
-          echo "If 404, wait 1-2 minutes and refresh"
+      - name: 🔗 Show URL
+        run: echo "Deployed to: https://${{ github.repository_owner }}.github.io/${{ github.repository_name }}/"
 
   publish-npm:
     name: 📦 Publish to NPM
-    needs: build-ui-kit
+    needs: build
+    if: ${{ github.event.inputs.job_to_run == 'publish-npm' || github.event.inputs.job_to_run == 'all' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -102,7 +106,7 @@ jobs:
         
       - name: 🚀 Publish to NPM
         run: |
+          echo "Publishing ${{ needs.build.outputs.version }} to NPM"
           npm publish --access public
-          echo "Package published: $(node -p 'require("./package.json").name')@$(node -p 'require("./package.json").version')"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

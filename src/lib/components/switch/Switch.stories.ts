@@ -8,7 +8,7 @@ const meta: Meta<typeof Switch> = {
   parameters: {
     docs: {
       description: {
-        component: "Switchcэписание ебать",
+        component: "Switch",
       },
     },
   },

@@ -1,7 +1,7 @@
 {
   "name": "ui-kit-custom-antd-v2",
   "private": false,
-  "version": "0.3.4",
+  "version": "0.3.5",
   "type": "module",
   "files": [
     "dist"

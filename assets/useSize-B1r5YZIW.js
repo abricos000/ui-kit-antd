@@ -1,0 +1,1 @@
+import{R as n}from"./index-yUhCOHB4.js";import{S as t}from"./withTheme-BZjfB2_G.js";const a=r=>{const e=n.useContext(t);return n.useMemo(()=>r?typeof r=="string"?r??e:r instanceof Function?r(e):e:e,[r,e])};export{a as u};

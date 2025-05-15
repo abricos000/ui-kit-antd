@@ -1,0 +1,10 @@
+import{R as e}from"./index-yUhCOHB4.js";import{w as l}from"./withTheme-BZjfB2_G.js";import{M as r}from"./index-DaRgDHKF.js";import"./index-udfneUKJ.js";import"./EllipsisOutlined-GMJRNmkL.js";import"./Overflow-B6oXC17A.js";import"./Keyframes-DkgPI3VG.js";import"./index-CRSZZ-wQ.js";import"./index-Bk0uRlbK.js";import"./toArray-Cp1e_jLy.js";import"./shadow-smhd3i8u.js";import"./isVisible-DhUEo0yb.js";import"./useMergedState-nnramASc.js";import"./KeyCode-c5NdJp32.js";import"./omit-DXgDXInf.js";import"./AntdIcon-ncu9Uip_.js";import"./Sider-DB0XJcyK.js";import"./LeftOutlined-DymCdJzE.js";import"./index-B0KqwWo5.js";import"./useZIndex-DNZU-7k-.js";import"./roundedArrow-BG_ysHtG.js";import"./reactNode-UryL7lBS.js";import"./Compact-z-h6XOSt.js";import"./useSize-B1r5YZIW.js";import"./colors-DYHlsvx_.js";const a=l(r),R={component:a,tags:["autodocs"],parameters:{docs:{description:{component:"Это пиздец, но работает"}}}},m=[{key:"1",icon:e.createElement(e.Fragment,null,"jjjjj"),label:"Option 1"},{key:"2",icon:e.createElement(e.Fragment,null,"jjjjj"),label:"Option 2"},{key:"3",icon:e.createElement(e.Fragment,null,"jjjj"),label:"Option 3"},{key:"sub1",label:"Navigation One",icon:e.createElement(e.Fragment,null,"jjjjj"),children:[{key:"5",label:"Option 5"},{key:"6",label:"Option 6"},{key:"7",label:"Option 7"},{key:"8",label:"Option 8"}]},{key:"sub2",label:"Navigation Two",icon:e.createElement(e.Fragment,null,"jjjjj"),children:[{key:"9",label:"Option 9"},{key:"10",label:"Option 10"},{key:"sub3",label:"Submenu",children:[{key:"11",label:"Option 11"},{key:"12",label:"Option 12"}]}]}],t={args:{defaultSelectedKeys:["1"],defaultOpenKeys:["sub1"],mode:"inline",theme:"dark",inlineCollapsed:!1,items:m}};var o,n,i;t.parameters={...t.parameters,docs:{...(o=t.parameters)==null?void 0:o.docs,source:{originalSource:`{
+  args: {
+    defaultSelectedKeys: ["1"],
+    defaultOpenKeys: ["sub1"],
+    mode: "inline",
+    theme: "dark",
+    inlineCollapsed: false,
+    items
+  }
+}`,...(i=(n=t.parameters)==null?void 0:n.docs)==null?void 0:i.source}}};const _=["Defauit"];export{t as Defauit,_ as __namedExportsOrder,R as default};
